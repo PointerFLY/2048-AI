@@ -2,8 +2,9 @@ import tkinter as tk
 
 import logic
 
-VIEW_SIZE = 400
+VIEW_WIDTH = 500
 PADDING = 10
+FONT = ("Verdana", 40, "bold")
 
 BG_COLOR = "#92877d"
 
@@ -20,15 +21,18 @@ FG_COLOR_DICT = {
 }
 
 
-class GameUI(tk.Frame):
+class GameUI(tk.Tk):
     def __init__(self):
         super(GameUI, self).__init__()
         self.logic = logic.Logic()
-        self.logic.matrix_updated = lambda x: self._update_cells()
+        self.logic.matrix_updated = lambda _: self._update_cells()
 
-        self.grid()
-        self.master.title('2048')
-        self.master.bind('<Key>', self._key_down)
+        self.title('2048')
+        self.bind('<Key>', self._key_down)
+
+        x = (self.winfo_screenwidth() - VIEW_WIDTH) / 2
+        y = (self.winfo_screenheight() - VIEW_WIDTH) / 2
+        self.geometry('%dx%d+%d+%d' % (VIEW_WIDTH, VIEW_WIDTH, x, y))
 
         self.labels = []
         self._setup_cells()
@@ -38,17 +42,18 @@ class GameUI(tk.Frame):
         self.mainloop()
 
     def _setup_cells(self):
-        background = tk.Frame(self, bg=BG_COLOR, width=VIEW_SIZE, height=VIEW_SIZE)
+        background = tk.Frame(self, bg=BG_COLOR)
         background.grid()
 
         for i in range(self.logic.row_count):
             row = []
             for j in range(self.logic.row_count):
-                cell = tk.Frame(background, width=VIEW_SIZE / self.logic.row_count, height=VIEW_SIZE / self.logic.row_count)
+                cell_width = (VIEW_WIDTH - PADDING * 2 * self.logic.row_count - 1) / self.logic.row_count
+                cell = tk.Frame(background, width=cell_width, height=cell_width)
                 cell.grid(row=i, column=j, padx=PADDING, pady=PADDING)
 
-                label = tk.Label(cell, justify=tk.CENTER, width=5, height=5)
-                label.grid()
+                label = tk.Label(cell, font=FONT)
+                label.place(relwidth=1, relheight=1)
                 row.append(label)
 
             self.labels.append(row)
