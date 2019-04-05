@@ -1,3 +1,6 @@
+import random
+
+
 class Action(int):
     LEFT = 0
     RIGHT = 1
@@ -10,7 +13,7 @@ class Logic:
         self.matrix_updated: callable = None
 
         self.row_count = 4
-        self.matrix = [[0] * self.row_count] * self.row_count
+        self.matrix = [[0 for _ in range(self.row_count)] for _ in range(self.row_count)]
 
     def perform_action(self, action: Action):
         # merge if possible
