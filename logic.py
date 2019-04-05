@@ -1,6 +1,3 @@
-from typing import Callable
-
-
 class Action(int):
     LEFT = 0
     RIGHT = 1
@@ -10,13 +7,16 @@ class Action(int):
 
 class Logic:
     def __init__(self):
-        self.matrix_updated: Callable[[list], None] = None
-        self.matrix = [[] * 4] * 4
+        self.matrix_updated: callable = None
+
+        self.row_count = 4
+        self.matrix = [[0] * self.row_count] * self.row_count
 
     def perform_action(self, action: Action):
-        pass  # Can merge?
+        # merge if possible
+        self.generate_next()
         self.matrix_updated(self.matrix)
 
-    def generate_next_tile(self):
+    def generate_next(self):
         # randomly generate
-        self.matrix_updated(self.matrix)
+        pass
