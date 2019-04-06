@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 import logic
 
 _VIEW_WIDTH = 500
@@ -24,7 +25,8 @@ class GameUI(tk.Tk):
     def __init__(self):
         super(GameUI, self).__init__()
         self.logic = logic.Logic()
-        self.logic.matrix_updated = lambda _: self._update_cells()
+        self.logic.tiles_updated = lambda: self._update_cells()
+        self.logic.game_ended = lambda: self._game_ended()
 
         self.title('2048')
         self.bind('<Key>', self._key_down)
@@ -62,10 +64,13 @@ class GameUI(tk.Tk):
     def _update_cells(self):
         for i in range(self.logic.row_count):
             for j in range(self.logic.row_count):
-                number = self.logic.matrix[i][j]
+                number = self.logic.tile(i, j)
                 self.labels[i][j].configure(text=str(number), bg=_BG_COLOR_DICT[number], fg=_FG_COLOR_DICT[number])
 
         self.update_idletasks()
+
+    def _game_ended(self):
+        messagebox.showinfo("Game Over", "No available action exists, the game is over!\n\nGood luck next time!")
 
     def _key_down(self, event):
         dic = {
