@@ -1,50 +1,126 @@
 import random
 
+_2_PROBABILITY = 0.9
+
 
 class Action(int):
-    LEFT = 0
-    RIGHT = 1
-    UP = 2
-    DOWN = 3
+    LEFT = 1
+    RIGHT = 2
+    UP = 3
+    DOWN = 4
 
 
 class Logic:
     def __init__(self):
         self.matrix_updated: callable = None
-
         self.row_count = 4
-        self.matrix = [[2 for _ in range(self.row_count)] for _ in range(self.row_count)]
+        self.matrix = [[0 for _ in range(self.row_count)] for _ in range(self.row_count)]
+        for _ in range(2):
+            self._generate_next()
 
     def perform_action(self, action: Action):
-        self._right()
+        dic = {
+            Action.LEFT: self._left,
+            Action.RIGHT: self._right,
+            Action.UP: self._up,
+            Action.DOWN: self._down
+        }
+        dic[action]()
+        # self._generate_next()
         self.matrix_updated(self.matrix)
-        print(self.matrix)
+
+    def _left(self):
+        for i in range(self.row_count):
+            stack = []
+            merge = []
+            for j in range(self.row_count):
+                if self.matrix[i][j] == 0:
+                    continue
+
+                if stack and merge[-1] and stack[-1] == self.matrix[i][j]:
+                    stack.append(2 * stack.pop())
+                    merge[-1] = False
+                else:
+                    stack.append(self.matrix[i][j])
+                    merge.append(True)
+
+            for j in range(self.row_count):
+                if j < len(stack):
+                    self.matrix[i][j] = stack[j]
+                else:
+                    self.matrix[i][j] = 0
 
     def _right(self):
-        i = 0
-        while i < self.row_count:
-            j = self.row_count - 2
-            while j >= 0:
-                if self.matrix[i][j] != 0 and self.matrix[i][j] == self.matrix[i][j+1]:
-                    self.matrix[i][j+1] += self.matrix[i][j]
-                    self.matrix[i][j] = 0
-                    j -= 1
-                j -= 1
-
-            zero_index = None
-            j = self.row_count - 1
-            while j > 0:
+        for i in reversed(range(self.row_count)):
+            stack = []
+            merge = []
+            for j in reversed(range(self.row_count)):
                 if self.matrix[i][j] == 0:
-                    if not zero_index:
-                        zero_index = j
-                elif zero_index:
-                    self.matrix[i][zero_index] = self.matrix[i][j]
-                    self.matrix[i][j] = 0
-                    zero_index -= 1
-                j -= 1
+                    continue
 
-            i += 1
+                if stack and merge[-1] and stack[-1] == self.matrix[i][j]:
+                    stack.append(2 * stack.pop())
+                    merge[-1] = False
+                else:
+                    stack.append(self.matrix[i][j])
+                    merge.append(True)
+
+            for j in reversed(range(self.row_count)):
+                stack_idx = self.row_count - 1 - j
+                if stack_idx < len(stack):
+                    self.matrix[i][j] = stack[stack_idx]
+                else:
+                    self.matrix[i][j] = 0
+
+    def _up(self):
+        for i in range(self.row_count):
+            stack = []
+            merge = []
+            for j in range(self.row_count):
+                if self.matrix[j][i] == 0:
+                    continue
+
+                if stack and merge[-1] and stack[-1] == self.matrix[j][i]:
+                    stack.append(2 * stack.pop())
+                    merge[-1] = False
+                else:
+                    stack.append(self.matrix[j][i])
+                    merge.append(True)
+
+            for j in range(self.row_count):
+                if j < len(stack):
+                    self.matrix[j][i] = stack[j]
+                else:
+                    self.matrix[j][i] = 0
+
+    def _down(self):
+        for i in reversed(range(self.row_count)):
+            stack = []
+            merge = []
+            for j in reversed(range(self.row_count)):
+                if self.matrix[j][i] == 0:
+                    continue
+
+                if stack and merge[-1] and stack[-1] == self.matrix[j][i]:
+                    stack.append(2 * stack.pop())
+                    merge[-1] = False
+                else:
+                    stack.append(self.matrix[j][i])
+                    merge.append(True)
+
+            for j in reversed(range(self.row_count)):
+                stack_idx = self.row_count - 1 - j
+                if stack_idx < len(stack):
+                    self.matrix[j][i] = stack[stack_idx]
+                else:
+                    self.matrix[j][i] = 0
 
     def _generate_next(self):
-        # randomly generate1
-        pass
+        zero_tiles = []
+        for i in range(self.row_count):
+            for j in range(self.row_count):
+                if self.matrix[i][j] == 0:
+                    zero_tiles.append((i, j))
+
+        i, j = zero_tiles[random.randrange(len(zero_tiles))]
+        self.matrix[i][j] = 2 if random.random() < _2_PROBABILITY else 4
