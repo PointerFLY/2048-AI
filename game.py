@@ -75,7 +75,8 @@ class GameUI(tk.Tk):
             'Down': logic.Action.DOWN,
         }
 
-        action = dic.get(event.keysym)
-        if action:
+        try:
+            action = dic[event.keysym]
             self.logic.perform_action(action)
-
+        except KeyError:
+            pass

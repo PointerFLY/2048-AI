@@ -1,6 +1,8 @@
 import random
 
 _2_PROBABILITY = 0.9
+_ROW_COUNT = 4
+_BEGIN_TILE_COUNT = 2
 
 
 class Action(int):
@@ -13,107 +15,63 @@ class Action(int):
 class Logic:
     def __init__(self):
         self.matrix_updated: callable = None
-        self.row_count = 4
+        self.row_count = _ROW_COUNT
         self.matrix = [[0 for _ in range(self.row_count)] for _ in range(self.row_count)]
-        for _ in range(2):
+        for _ in range(_BEGIN_TILE_COUNT):
             self._generate_next()
 
     def perform_action(self, action: Action):
         dic = {
-            Action.LEFT: self._left,
-            Action.RIGHT: self._right,
-            Action.UP: self._up,
-            Action.DOWN: self._down
+            Action.LEFT: (False, False),
+            Action.RIGHT: (True, False),
+            Action.UP: (False, True),
+            Action.DOWN: (True, True),
         }
-        dic[action]()
-        # self._generate_next()
+
+        reverse, transpose = dic[action]
+        self._update_matrix(reverse, transpose)
+
+        self._generate_next()
         self.matrix_updated(self.matrix)
 
-    def _left(self):
-        for i in range(self.row_count):
-            stack = []
-            merge = []
-            for j in range(self.row_count):
-                if self.matrix[i][j] == 0:
+    def _update_matrix(self, reverse: bool, transpose: bool):
+        indices = list(range(self.row_count))
+        if reverse:
+            indices.reverse()
+
+        if transpose:
+            def get_tile(i, j):
+                return self.matrix[j][i]
+
+            def set_tile(i, j, number):
+                self.matrix[j][i] = number
+        else:
+            def get_tile(i, j):
+                return self.matrix[i][j]
+
+            def set_tile(i, j, number):
+                self.matrix[i][j] = number
+
+        for i in indices:
+            stack = []  # Use stack to track tiles
+            merged = []  # Each tile can only merge once
+            for j in indices:
+                if get_tile(i, j) == 0:
                     continue
 
-                if stack and merge[-1] and stack[-1] == self.matrix[i][j]:
+                if stack and not merged[-1] and stack[-1] == get_tile(i, j):
                     stack.append(2 * stack.pop())
-                    merge[-1] = False
+                    merged[-1] = True
                 else:
-                    stack.append(self.matrix[i][j])
-                    merge.append(True)
+                    stack.append(get_tile(i, j))
+                    merged.append(False)
 
-            for j in range(self.row_count):
-                if j < len(stack):
-                    self.matrix[i][j] = stack[j]
-                else:
-                    self.matrix[i][j] = 0
-
-    def _right(self):
-        for i in reversed(range(self.row_count)):
-            stack = []
-            merge = []
-            for j in reversed(range(self.row_count)):
-                if self.matrix[i][j] == 0:
-                    continue
-
-                if stack and merge[-1] and stack[-1] == self.matrix[i][j]:
-                    stack.append(2 * stack.pop())
-                    merge[-1] = False
-                else:
-                    stack.append(self.matrix[i][j])
-                    merge.append(True)
-
-            for j in reversed(range(self.row_count)):
-                stack_idx = self.row_count - 1 - j
+            for j in indices:
+                stack_idx = self.row_count - 1 - j if reverse else j
                 if stack_idx < len(stack):
-                    self.matrix[i][j] = stack[stack_idx]
+                    set_tile(i, j, stack[stack_idx])
                 else:
-                    self.matrix[i][j] = 0
-
-    def _up(self):
-        for i in range(self.row_count):
-            stack = []
-            merge = []
-            for j in range(self.row_count):
-                if self.matrix[j][i] == 0:
-                    continue
-
-                if stack and merge[-1] and stack[-1] == self.matrix[j][i]:
-                    stack.append(2 * stack.pop())
-                    merge[-1] = False
-                else:
-                    stack.append(self.matrix[j][i])
-                    merge.append(True)
-
-            for j in range(self.row_count):
-                if j < len(stack):
-                    self.matrix[j][i] = stack[j]
-                else:
-                    self.matrix[j][i] = 0
-
-    def _down(self):
-        for i in reversed(range(self.row_count)):
-            stack = []
-            merge = []
-            for j in reversed(range(self.row_count)):
-                if self.matrix[j][i] == 0:
-                    continue
-
-                if stack and merge[-1] and stack[-1] == self.matrix[j][i]:
-                    stack.append(2 * stack.pop())
-                    merge[-1] = False
-                else:
-                    stack.append(self.matrix[j][i])
-                    merge.append(True)
-
-            for j in reversed(range(self.row_count)):
-                stack_idx = self.row_count - 1 - j
-                if stack_idx < len(stack):
-                    self.matrix[j][i] = stack[stack_idx]
-                else:
-                    self.matrix[j][i] = 0
+                    set_tile(i, j, 0)
 
     def _generate_next(self):
         zero_tiles = []
