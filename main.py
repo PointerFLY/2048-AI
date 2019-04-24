@@ -5,7 +5,7 @@ from greedy import GreedyAgent
 
 
 game = Game()
-agent = GreedyAgent(game.state)
+agent = GreedyAgent(game)
 agent.start()
 
 game.show()

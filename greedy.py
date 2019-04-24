@@ -1,12 +1,8 @@
 from agent import Agent
-from state import State
 
 
 class GreedyAgent(Agent):
-    def __init__(self, state: State):
-        self.state = state
-
-    def start(self):
+    def next_action(self):
         legal_actions = self.state.legal_actions()
         if not legal_actions:
             return
@@ -20,6 +16,4 @@ class GreedyAgent(Agent):
             return score
 
         best_action = max(legal_actions, key=get_score)
-        self.state.perform_action(best_action)
-
-        self.start()
+        return best_action
