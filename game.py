@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-import logic
+from state import State
 
 _VIEW_WIDTH = 500
 _PADDING = 7
@@ -21,15 +21,14 @@ _FG_COLOR_DICT = {
 }
 
 
-class GameUI(tk.Tk):
+class Game(tk.Tk):
     def __init__(self):
-        super(GameUI, self).__init__()
-        self.logic = logic.Logic()
-        self.logic.tiles_updated = lambda: self._update_cells()
-        self.logic.game_ended = lambda: self._game_ended()
+        super(Game, self).__init__()
+        self.state = State()
+        self.state.tiles_updated = lambda: self._update_cells()
+        self.state.game_ended = lambda: self._game_ended()
 
         self.title('2048')
-        self.bind('<Key>', self._key_down)
 
         x = (self.winfo_screenwidth() - _VIEW_WIDTH) / 2
         y = (self.winfo_screenheight() - _VIEW_WIDTH) / 2
@@ -46,12 +45,12 @@ class GameUI(tk.Tk):
         background = tk.Frame(self, bg=_BG_COLOR, padx=_PADDING, pady=_PADDING)
         background.place(relwidth=1, relheight=1)
 
-        for i in range(self.logic.row_count):
+        for i in range(self.state.row_count):
             tk.Grid.columnconfigure(background, i, weight=1)
             tk.Grid.rowconfigure(background, i, weight=1)
 
             row = []
-            for j in range(self.logic.row_count):
+            for j in range(self.state.row_count):
                 cell = tk.Frame(background)
                 cell.grid(row=i, column=j, padx=_PADDING, pady=_PADDING, sticky=tk.NSEW)
 
@@ -62,26 +61,12 @@ class GameUI(tk.Tk):
             self.labels.append(row)
 
     def _update_cells(self):
-        for i in range(self.logic.row_count):
-            for j in range(self.logic.row_count):
-                number = self.logic.tile(i, j)
+        for i in range(self.state.row_count):
+            for j in range(self.state.row_count):
+                number = self.state.matrix[i][j]
                 self.labels[i][j].configure(text=str(number), bg=_BG_COLOR_DICT[number], fg=_FG_COLOR_DICT[number])
 
         self.update_idletasks()
 
     def _game_ended(self):
         messagebox.showinfo("Game Over", "No available action exists, the game is over!\n\nGood luck next time!")
-
-    def _key_down(self, event):
-        dic = {
-            'Left': logic.Action.LEFT,
-            'Right': logic.Action.RIGHT,
-            'Up': logic.Action.UP,
-            'Down': logic.Action.DOWN,
-        }
-
-        try:
-            action = dic[event.keysym]
-            self.logic.perform_action(action)
-        except KeyError:
-            pass

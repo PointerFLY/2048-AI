@@ -1,4 +1,9 @@
-import game
+from game import Game
+from human import HumanAgent
 
-ui = game.GameUI()
-ui.show()
+
+game = Game()
+agent = HumanAgent(game)
+agent.start()
+
+game.show()
