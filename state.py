@@ -1,4 +1,5 @@
 import random
+from typing import Optional
 
 _2_PROBABILITY = 0.9
 _ROW_COUNT = 4
@@ -17,10 +18,81 @@ class State:
         self.tiles_updated: callable = None
         self.game_ended: callable = None
         self.row_count = _ROW_COUNT
+        self.two_odds = _2_PROBABILITY
         self.matrix = [[0 for _ in range(self.row_count)] for _ in range(self.row_count)]
         self._legal_actions_cache = None
         for _ in range(_BEGIN_TILE_COUNT):
             self._generate_next()
+
+    def get_successors(self, action: Action) -> [('State', int)]:
+        if action not in self.legal_actions():
+            return None
+
+        reverse, transpose = self._reverse_transpose(action)
+
+        state = self.copy()
+        state._update_matrix(reverse, transpose)
+
+        successors = []
+        for i, j in state.empty_tiles():
+            successor = state.copy()
+            successor.matrix[i][j] = 2
+            successors.append((successor, 2))
+
+            successor = state.copy()
+            successor.matrix[i][j] = 4
+            successors.append((successor, 4))
+
+        return successors
+
+    def direct_successor(self, action) -> Optional['State']:
+        if action not in self.legal_actions():
+            return None
+
+        reverse, transpose = self._reverse_transpose(action)
+
+        state = self.copy()
+        state._update_matrix(reverse, transpose)
+        return state
+
+    def get_merges(self, action) -> {int, int}:
+        if action not in self.legal_actions():
+            return None
+
+        reverse, transpose = self._reverse_transpose(action)
+
+        indices = list(range(self.row_count))
+        if reverse:
+            indices.reverse()
+
+        merges = {}
+        for i in indices:
+            candidate = None
+            for j in indices:
+                if self._tile(i, j, transpose) == 0:
+                    continue
+
+                number = self._tile(i, j, transpose)
+                if candidate and candidate == number:
+                    result = candidate * 2
+                    if merges.get(result):
+                        merges[result] += 1
+                    else:
+                        merges[result] = 1
+                    candidate = None
+                else:
+                    candidate = number
+
+        return merges
+
+    def empty_tiles(self):
+        empty_tiles = []
+        for i in range(self.row_count):
+            for j in range(self.row_count):
+                if self.matrix[i][j] == 0:
+                    empty_tiles.append((i, j))
+
+        return empty_tiles
 
     def legal_actions(self) -> list:
         if not self._legal_actions_cache:
@@ -38,14 +110,7 @@ class State:
         if action not in self.legal_actions():
             return
 
-        dic = {
-            Action.LEFT: (False, False),
-            Action.RIGHT: (True, False),
-            Action.UP: (False, True),
-            Action.DOWN: (True, True),
-        }
-
-        reverse, transpose = dic[action]
+        reverse, transpose = self._reverse_transpose(action)
         self._update_matrix(reverse, transpose)
 
         self._generate_next()
@@ -53,6 +118,20 @@ class State:
 
         if not self.legal_actions():
             self.game_ended()
+
+    def copy(self):
+        state = State()
+        state.matrix = self.matrix
+        return state
+
+    def _reverse_transpose(self, action):
+        dic = {
+            Action.LEFT: (False, False),
+            Action.RIGHT: (True, False),
+            Action.UP: (False, True),
+            Action.DOWN: (True, True),
+        }
+        return dic[action]
 
     def _tile(self, i, j, transpose=False):
         if transpose:
@@ -130,11 +209,6 @@ class State:
                     self._set_tile(i, j, 0, transpose)
 
     def _generate_next(self):
-        zero_tiles = []
-        for i in range(self.row_count):
-            for j in range(self.row_count):
-                if self.matrix[i][j] == 0:
-                    zero_tiles.append((i, j))
-
-        i, j = zero_tiles[random.randrange(len(zero_tiles))]
-        self.matrix[i][j] = 2 if random.random() < _2_PROBABILITY else 4
+        empty_tiles = self.empty_tiles()
+        i, j = empty_tiles[random.randrange(len(empty_tiles))]
+        self.matrix[i][j] = 2 if random.random() < self.two_odds else 4
