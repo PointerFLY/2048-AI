@@ -27,7 +27,7 @@ class State:
     def get_successors(self, action: Action) -> [('State', int)]:
         direct_state = self.direct_successor(action)
         if not direct_state:
-            return None
+            return []
 
         successors = []
         for i, j in direct_state.empty_tiles():
@@ -53,7 +53,7 @@ class State:
 
     def get_merges(self, action) -> {int, int}:
         if action not in self.legal_actions():
-            return None
+            return {}
 
         reverse, transpose = self._reverse_transpose(action)
 
