@@ -25,21 +25,17 @@ class State:
             self._generate_next()
 
     def get_successors(self, action: Action) -> [('State', int)]:
-        if action not in self.legal_actions():
+        direct_state = self.direct_successor(action)
+        if not direct_state:
             return None
 
-        reverse, transpose = self._reverse_transpose(action)
-
-        state = self.copy()
-        state._update_matrix(reverse, transpose)
-
         successors = []
-        for i, j in state.empty_tiles():
-            successor = state.copy()
+        for i, j in direct_state.empty_tiles():
+            successor = direct_state.copy()
             successor.matrix[i][j] = 2
             successors.append((successor, 2))
 
-            successor = state.copy()
+            successor = direct_state.copy()
             successor.matrix[i][j] = 4
             successors.append((successor, 4))
 
@@ -121,7 +117,10 @@ class State:
 
     def copy(self):
         state = State()
-        state.matrix = self.matrix
+        state._legal_actions_cache = self._legal_actions_cache
+        for i in range(self.row_count):
+            for j in range(self.row_count):
+                state.matrix[i][j] = self.matrix[i][j]
         return state
 
     def _reverse_transpose(self, action):
