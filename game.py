@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from state import State
+import queue as q
 
 _VIEW_WIDTH = 500
 _PADDING = 7
@@ -20,6 +21,8 @@ _FG_COLOR_DICT = {
     16384: '#776e65', 32768: '#776e65', 65536: '#f9f6f2'
 }
 
+_UI_INTERVAL = 1
+
 
 class Game(tk.Tk):
     def __init__(self):
@@ -38,8 +41,21 @@ class Game(tk.Tk):
         self._setup_cells()
         self._update_cells()
 
+        self.ui_interval = _UI_INTERVAL
+        self._queue = q.Queue()
+
+    def call_on_main(self, func: callable):
+        self._queue.put_nowait(func)
+
     def show(self):
+        self.after(self.ui_interval, self.periodic_call)
         self.mainloop()
+
+    def periodic_call(self):
+        while self._queue.qsize():
+            task = self._queue.get_nowait()
+            task()
+        self.after(self.ui_interval, self.periodic_call)
 
     def _setup_cells(self):
         background = tk.Frame(self, bg=_BG_COLOR, padx=_PADDING, pady=_PADDING)
@@ -69,4 +85,5 @@ class Game(tk.Tk):
         self.update_idletasks()
 
     def _game_ended(self):
-        messagebox.showinfo("Game Over", "No available action exists, the game is over!\n\nGood luck next time!")
+        pass
+        # messagebox.showinfo("Game Over", "No available action exists, the game is over!\n\nGood luck next time!")
