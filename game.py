@@ -21,15 +21,13 @@ _FG_COLOR_DICT = {
     16384: '#776e65', 32768: '#776e65', 65536: '#f9f6f2'
 }
 
-_UI_INTERVAL = 1
+_UI_INTERVAL = 16
 
 
 class Game(tk.Tk):
     def __init__(self):
         super(Game, self).__init__()
         self.state = State()
-        self.state.tiles_updated = lambda: self._update_cells()
-        self.state.game_ended = lambda: self._game_ended()
 
         self.title('2048')
 
@@ -41,21 +39,13 @@ class Game(tk.Tk):
         self._setup_cells()
         self._update_cells()
 
-        self.ui_interval = _UI_INTERVAL
-        self._queue = q.Queue()
-
-    def call_on_main(self, func: callable):
-        self._queue.put_nowait(func)
-
     def show(self):
-        self.after(self.ui_interval, self.periodic_call)
+        self.after(_UI_INTERVAL, self.periodic_call)
         self.mainloop()
 
     def periodic_call(self):
-        while self._queue.qsize():
-            task = self._queue.get_nowait()
-            task()
-        self.after(self.ui_interval, self.periodic_call)
+        self._update_cells()
+        self.after(_UI_INTERVAL, self.periodic_call)
 
     def _setup_cells(self):
         background = tk.Frame(self, bg=_BG_COLOR, padx=_PADDING, pady=_PADDING)
@@ -81,9 +71,3 @@ class Game(tk.Tk):
             for j in range(self.state.row_count):
                 number = self.state.matrix[i][j]
                 self.labels[i][j].configure(text=str(number), bg=_BG_COLOR_DICT[number], fg=_FG_COLOR_DICT[number])
-
-        self.update_idletasks()
-
-    def _game_ended(self):
-        pass
-        # messagebox.showinfo("Game Over", "No available action exists, the game is over!\n\nGood luck next time!")

@@ -7,13 +7,17 @@ class Agent:
     def __init__(self, game: Game):
         self.game = game
         self.state = game.state
-        self.show_ui = True
 
     def start(self):
         thread = Thread(target=self._time_process)
         thread.start()
 
+    def setup(self):
+        pass
+
     def _time_process(self):
+        self.setup()
+
         start = time.time()
         self.process()
         end = time.time()
@@ -24,9 +28,7 @@ class Agent:
         if not action:
             return
 
-        if self.show_ui:
-            self.game.call_on_main(lambda: self.state.perform_action(action))
-            time.sleep(self.game.ui_interval / 1000)
+        self.state.perform_action(action)
 
         self.process()
 

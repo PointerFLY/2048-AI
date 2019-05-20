@@ -3,6 +3,7 @@ from human import HumanAgent
 from stochastic import StochasticAgent
 from greedy import GreedyAgent
 from expectimax import ExpectimaxAgent
+from learning import LearningAgent
 
 
 game = Game()

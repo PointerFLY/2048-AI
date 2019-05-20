@@ -15,8 +15,6 @@ class Action(str):
 
 class State:
     def __init__(self):
-        self.tiles_updated: callable = None
-        self.game_ended: callable = None
         self.row_count = _ROW_COUNT
         self.two_odds = _2_PROBABILITY
         self.matrix = [[0 for _ in range(self.row_count)] for _ in range(self.row_count)]
@@ -100,7 +98,6 @@ class State:
 
     def perform_action(self, action: Action):
         if not self.legal_actions():
-            self.game_ended()
             return
 
         if action not in self.legal_actions():
@@ -110,10 +107,6 @@ class State:
         self._update_matrix(reverse, transpose)
 
         self._generate_next()
-        self.tiles_updated()
-
-        if not self.legal_actions():
-            self.game_ended()
 
     def copy(self):
         state = State()
