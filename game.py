@@ -44,7 +44,10 @@ class Game(tk.Tk):
         self.mainloop()
 
     def periodic_call(self):
-        self._update_cells()
+        if self.state.ui_dirty:
+            self.state.ui_dirty = False
+            self._update_cells()
+
         self.after(_UI_INTERVAL, self.periodic_call)
 
     def _setup_cells(self):

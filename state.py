@@ -18,6 +18,7 @@ class State:
         self.row_count = _ROW_COUNT
         self.two_odds = _2_PROBABILITY
         self.matrix = [[0 for _ in range(self.row_count)] for _ in range(self.row_count)]
+        self.ui_dirty = True
         self._legal_actions_cache = None
         for _ in range(_BEGIN_TILE_COUNT):
             self._generate_next()
@@ -105,8 +106,9 @@ class State:
 
         reverse, transpose = self._reverse_transpose(action)
         self._update_matrix(reverse, transpose)
-
         self._generate_next()
+
+        self.ui_dirty = True
 
     def copy(self):
         state = State()
