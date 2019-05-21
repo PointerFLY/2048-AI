@@ -1,6 +1,6 @@
 from agent import Agent
 
-_DEPTH = 3
+_DEPTH = 4
 
 
 class ExpectimaxAgent(Agent):
@@ -16,18 +16,10 @@ class ExpectimaxAgent(Agent):
         if not state.legal_actions():
             return None, 0
 
-        def get_score(action) -> int:
-            score = 0
-            merges = self.state.get_merges(action)
-            for k, v in merges.items():
-                score += k * v
-            score += self.expect(state, action, depth)
-            return score
-
         best_score = 0
         best_action = state.legal_actions()[0]
         for action in state.legal_actions():
-            score = get_score(action)
+            score = self.expect(state, action, depth)
             if score > best_score:
                 best_action = action
                 best_score = score
@@ -37,7 +29,7 @@ class ExpectimaxAgent(Agent):
     def expect(self, state, action, depth):
         depth -= 1
         if depth == 0:
-            return 0
+            return self.state.score
 
         successors = state.get_successors(action)
 

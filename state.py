@@ -19,6 +19,7 @@ class State:
         self.two_odds = _2_PROBABILITY
         self.matrix = [[0 for _ in range(self.row_count)] for _ in range(self.row_count)]
         self.ui_dirty = True
+        self.score = 0
         self._legal_actions_cache = None
         for _ in range(_BEGIN_TILE_COUNT):
             self._generate_next()
@@ -189,7 +190,9 @@ class State:
                     continue
 
                 if stack and not merged[-1] and stack[-1] == self._tile(i, j, transpose):
-                    stack.append(2 * stack.pop())
+                    v = 2 * stack.pop()
+                    stack.append(v)
+                    self.score += v
                     merged[-1] = True
                 else:
                     stack.append(self._tile(i, j, transpose))
