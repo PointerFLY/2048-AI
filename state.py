@@ -113,6 +113,7 @@ class State:
 
     def copy(self):
         state = State()
+        state.score = self.score
         state._legal_actions_cache = self._legal_actions_cache
         for i in range(self.row_count):
             for j in range(self.row_count):

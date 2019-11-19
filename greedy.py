@@ -8,12 +8,9 @@ class GreedyAgent(Agent):
             return
 
         def get_score(action) -> int:
-            score = 0
-            merges = self.state.get_merges(action)
-            for k, v in merges.items():
-                score += k * v
-
-            return score
+            old = self.state.score
+            new = self.state.direct_successor(action).score
+            return new - old
 
         best_action = max(legal_actions, key=get_score)
         return best_action

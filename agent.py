@@ -1,6 +1,7 @@
 from game import Game
 from threading import Thread
 import time
+import numpy as np
 
 
 class Agent:
@@ -22,6 +23,8 @@ class Agent:
         self.process()
         end = time.time()
         print('Execution time: {} s'.format(end - start))
+        print('Final state:')
+        print(np.array(self.state.matrix))
 
     def process(self):
         action = self.next_action()
