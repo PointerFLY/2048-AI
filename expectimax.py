@@ -13,7 +13,17 @@ class ExpectimaxAgent(Agent):
         return best_action
 
     def evaluate(self, state):
-        return state.score
+        eval_ = 0
+        r = 0.7
+        for i in range(4):
+            eval_ += state.matrix[0][i] * pow(r, i) * 4
+        for i in range(4):
+            eval_ += state.matrix[1][i] * pow(r, (4 - i) + 3)
+        for i in range(4):
+            eval_ += state.matrix[2][i] * pow(r, i + 8)
+        for i in range(4):
+            eval_ += state.matrix[3][i] * pow(r, (4 - i) + 11)
+        return eval_
 
     def best(self, state, depth):
         if not state.legal_actions():
@@ -41,9 +51,11 @@ class ExpectimaxAgent(Agent):
             state = successor[0]
             value = successor[1]
 
-            if value == 2:
-                eval_ += self.best(state, depth)[1] * self.state.two_odds
-            else:
-                eval_ += self.best(state, depth)[1] * (1 - self.state.two_odds)
+            two_odds = state.two_odds / (len(successors) / 2)
+            four_odds = (1 - state.two_odds) / (len(successors) / 2)
 
+            if value == 2:
+                eval_ += self.best(state, depth)[1] * two_odds
+            else:
+                eval_ += self.best(state, depth)[1] * four_odds
         return eval_
