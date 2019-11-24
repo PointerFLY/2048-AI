@@ -74,3 +74,4 @@ class Game(tk.Tk):
             for j in range(self.state.row_count):
                 number = self.state.matrix[i][j]
                 self.labels[i][j].configure(text=str(number), bg=_BG_COLOR_DICT[number], fg=_FG_COLOR_DICT[number])
+                self.title(self.state.score)

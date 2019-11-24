@@ -15,14 +15,15 @@ class ExpectimaxAgent(Agent):
     def evaluate(self, state):
         eval_ = 0
         r = 0.7
-        for i in range(4):
-            eval_ += state.matrix[0][i] * pow(r, i) * 4
-        for i in range(4):
-            eval_ += state.matrix[1][i] * pow(r, (4 - i) + 3)
-        for i in range(4):
-            eval_ += state.matrix[2][i] * pow(r, i + 8)
-        for i in range(4):
-            eval_ += state.matrix[3][i] * pow(r, (4 - i) + 11)
+        w = 0
+        for i in range(state.row_count):
+            w = 4 if i == 0 else 1
+            for j in range(state.row_count):
+                if i % 2 == 0:
+                    eval_ += state.matrix[i][j] * pow(r, state.row_count * i + j) * w
+                else:
+                    eval_ += state.matrix[i][j] * pow(r, state.row_count * i + (state.row_count - 1 - j)) * w
+
         return eval_
 
     def best(self, state, depth):
