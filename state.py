@@ -22,7 +22,7 @@ class State:
         self.score = 0
         self._legal_actions_cache = None
         for _ in range(_BEGIN_TILE_COUNT):
-            self._generate_next()
+            self.generate_next()
 
     def get_successors(self, action: Action) -> [('State', int)]:
         direct_state = self.direct_successor(action)
@@ -107,7 +107,7 @@ class State:
 
         reverse, transpose = self._reverse_transpose(action)
         self._update_matrix(reverse, transpose)
-        self._generate_next()
+        self.generate_next()
 
         self.ui_dirty = True
 
@@ -119,6 +119,11 @@ class State:
             for j in range(self.row_count):
                 state.matrix[i][j] = self.matrix[i][j]
         return state
+
+    def generate_next(self):
+        empty_tiles = self.empty_tiles()
+        i, j = empty_tiles[random.randrange(len(empty_tiles))]
+        self.matrix[i][j] = 2 if random.random() < self.two_odds else 4
 
     def _reverse_transpose(self, action):
         dic = {
@@ -205,8 +210,3 @@ class State:
                     self._set_tile(i, j, stack[stack_idx], transpose)
                 else:
                     self._set_tile(i, j, 0, transpose)
-
-    def _generate_next(self):
-        empty_tiles = self.empty_tiles()
-        i, j = empty_tiles[random.randrange(len(empty_tiles))]
-        self.matrix[i][j] = 2 if random.random() < self.two_odds else 4

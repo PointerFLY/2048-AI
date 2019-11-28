@@ -4,13 +4,14 @@ from stochastic import StochasticAgent
 from expectimax import ExpectimaxAgent
 from stochastic import StochasticAgent
 from monte_carlo import MonteCarloAgent
+from mcts import MonteCarloTreeSearchAgent
 import sys
 
 sys.setrecursionlimit(10000)
 
 
 game = Game()
-agent = MonteCarloAgent(game)
+agent = MonteCarloTreeSearchAgent(game)
 agent.start()
 
 game.show()
