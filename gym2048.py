@@ -29,19 +29,27 @@ class Gym2048(gym.Env[typing.Tuple, np.int64]):
         self._add_tile()
 
         reward = self.score - prev_score
-        terminated = False
+        terminated = self._is_terminated()
 
         return self.state, reward, terminated, False, {}
 
+    def highest_tile(self):
+        return np.max(self.state)
+
     def sample_action(self):
-        return self.action_space.sample(mask=np.ones(4, dtype=np.int8))
+        actions = self._legal_actions(False)
+        actions = actions.union(self._legal_actions(True))
+        return np.random.choice(list(actions))
+
+    def _is_terminated(self):
+        return not self._legal_actions(False) and not self._legal_actions(True)
 
     def _act(self, action):
         reverse_transposes = [
-            (False, False),
-            (True, False),
-            (False, True),
-            (True, True),
+            (False, False),  # left
+            (True, False),  # right
+            (False, True),  # up
+            (True, True),  # down
         ]
         reverse, transpose = reverse_transposes[action]
         self._update_state(reverse, transpose)
@@ -77,6 +85,44 @@ class Gym2048(gym.Env[typing.Tuple, np.int64]):
                     self._set_tile(i, j, stack[stack_idx], transpose)
                 else:
                     self._set_tile(i, j, 0, transpose)
+
+    def _legal_actions(self, transpose: bool):
+        actions = set()
+        for i in range(self.state.shape[0]):
+            found_zero = False
+            found_value = False
+
+            for j in range(self.state.shape[0]):
+                if self._tile(i, j, transpose) == 0:
+                    found_zero = True
+                    if found_value:
+                        if transpose:
+                            actions.add(3)
+                        else:
+                            actions.add(2)
+                elif self._tile(i, j, transpose) != 0:
+                    found_value = True
+                    if found_zero:
+                        if transpose:
+                            actions.add(2)
+                        else:
+                            actions.add(0)
+
+                if j < self.state.shape[0] - 1:
+                    if self._tile(i, j, transpose) != 0 and self._tile(
+                        i, j, transpose
+                    ) == self._tile(i, j + 1, transpose):
+                        if transpose:
+                            actions.add(2)
+                            actions.add(3)
+                        else:
+                            actions.add(0)
+                            actions.add(1)
+
+                if len(actions) == 2:
+                    return actions
+
+        return actions
 
     def _tile(self, i, j, transpose=False):
         if transpose:
