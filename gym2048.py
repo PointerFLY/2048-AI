@@ -23,22 +23,24 @@ class Gym2048(gym.Env[typing.Tuple, np.int64]):
 
     def step(self, action):
         assert self.action_space.contains(action)
-        prev_score = self.score
+        prev_highest = self.highest_tile()
 
         self._act(action)
-        self._add_tile()
 
-        reward = self.score - prev_score
+        self._add_tile()
         terminated = self._is_terminated()
 
+        reward = self.highest_tile() - prev_highest + 1 if not terminated else 0
         return self.state, reward, terminated, False, {}
 
     def highest_tile(self):
-        return np.max(self.state)
+        return int(np.max(self.state))
 
     def sample_action(self):
         actions = self._legal_actions(False)
         actions = actions.union(self._legal_actions(True))
+        if not actions:
+            return None
         return np.random.choice(list(actions))
 
     def _is_terminated(self):
@@ -138,6 +140,8 @@ class Gym2048(gym.Env[typing.Tuple, np.int64]):
 
     def _add_tile(self):
         rows, cols = np.where(self.state == 0)
+        if len(rows) == 0:
+            return
         i = np.random.choice(rows)
         j = np.random.choice(cols)
         self.state[i, j] = 2 if np.random.random() < 0.9 else 4
