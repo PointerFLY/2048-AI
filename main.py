@@ -11,7 +11,7 @@ sys.setrecursionlimit(10000)
 
 
 game = Game()
-agent = MonteCarloTreeSearchAgent(game)
+agent = ExpectimaxAgent(game)
 agent.start()
 
 game.show()

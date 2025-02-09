@@ -1,77 +1,126 @@
-import tkinter as tk
-from tkinter import messagebox
+import pygame
+import sys
 from state import State
-import queue as q
 
-_VIEW_WIDTH = 500
-_PADDING = 7
-_FONT = ('Verdana', 40, 'bold')
+# Constants
+WINDOW_SIZE = 500
+PADDING = 7
+FONT_SIZE = 40
 
-_BG_COLOR = '#92877d'
+# Colors
+BG_COLOR = "#92877d"
 
-_BG_COLOR_DICT = {
-    0: '#cdc1b5', 2: '#eee4da', 4: '#ede0c8', 8: '#f2b179', 16: '#f59563', 32: '#f67c5f', 64: '#f65e3b', 128: '#edcf72',
-    256: '#edcc61', 512: '#edc850', 1024: '#edc53f', 2048: '#edc22e', 4096: '#eee4da', 8192: '#edc22e',
-    16384: '#f2b179', 32768: '#f59563', 65536: '#f67c5f'
+BG_COLOR_DICT = {
+    0: "#cdc1b5",
+    2: "#eee4da",
+    4: "#ede0c8",
+    8: "#f2b179",
+    16: "#f59563",
+    32: "#f67c5f",
+    64: "#f65e3b",
+    128: "#edcf72",
+    256: "#edcc61",
+    512: "#edc850",
+    1024: "#edc53f",
+    2048: "#edc22e",
+    4096: "#eee4da",
+    8192: "#edc22e",
+    16384: "#f2b179",
+    32768: "#f59563",
+    65536: "#f67c5f",
 }
 
-_FG_COLOR_DICT = {
-    0: '#cdc1b5', 2: '#776e65', 4: '#776e65', 8: '#f9f6f2', 16: '#f9f6f2', 32: '#f9f6f2', 64: '#f9f6f2', 128: '#f9f6f2',
-    256: '#f9f6f2', 512: '#f9f6f2', 1024: '#f9f6f2', 2048: '#f9f6f2', 4096: '#776e65', 8192: '#f9f6f2',
-    16384: '#776e65', 32768: '#776e65', 65536: '#f9f6f2'
+FG_COLOR_DICT = {
+    0: "#cdc1b5",
+    2: "#776e65",
+    4: "#776e65",
+    8: "#f9f6f2",
+    16: "#f9f6f2",
+    32: "#f9f6f2",
+    64: "#f9f6f2",
+    128: "#f9f6f2",
+    256: "#f9f6f2",
+    512: "#f9f6f2",
+    1024: "#f9f6f2",
+    2048: "#f9f6f2",
+    4096: "#776e65",
+    8192: "#f9f6f2",
+    16384: "#776e65",
+    32768: "#776e65",
+    65536: "#f9f6f2",
 }
 
-_UI_INTERVAL = 16
+FPS = 60
 
 
-class Game(tk.Tk):
+def hex_to_rgb(hex_color):
+    """Convert hex color to RGB tuple"""
+    hex_color = hex_color.lstrip("#")
+    return tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
+
+
+class Game:
     def __init__(self):
-        super(Game, self).__init__()
+        pygame.init()
+        pygame.display.set_caption("2048")
+
         self.state = State()
+        self.window = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
+        self.clock = pygame.time.Clock()
 
-        self.title('2048')
+        # Initialize font
+        self.font = pygame.font.SysFont("Arial", FONT_SIZE, bold=True)
 
-        x = (self.winfo_screenwidth() - _VIEW_WIDTH) / 2
-        y = (self.winfo_screenheight() - _VIEW_WIDTH) / 2
-        self.geometry('%dx%d+%d+%d' % (_VIEW_WIDTH, _VIEW_WIDTH, x, y))
-
-        self.labels = []
-        self._setup_cells()
-        self._update_cells()
+        # Calculate cell size
+        self.cell_size = (
+            WINDOW_SIZE - (self.state.row_count + 1) * PADDING
+        ) // self.state.row_count
 
     def show(self):
-        self.after(_UI_INTERVAL, self.periodic_call)
-        self.mainloop()
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    pygame.quit()
+                    sys.exit()
 
-    def periodic_call(self):
-        if self.state.ui_dirty:
-            self.state.ui_dirty = False
-            self._update_cells()
+            if self.state.ui_dirty:
+                self.state.ui_dirty = False
+                self._update_display()
 
-        self.after(_UI_INTERVAL, self.periodic_call)
+            self.clock.tick(FPS)
 
-    def _setup_cells(self):
-        background = tk.Frame(self, bg=_BG_COLOR, padx=_PADDING, pady=_PADDING)
-        background.place(relwidth=1, relheight=1)
+    def _update_display(self):
+        # Fill background
+        self.window.fill(hex_to_rgb(BG_COLOR))
 
-        for i in range(self.state.row_count):
-            tk.Grid.columnconfigure(background, i, weight=1)
-            tk.Grid.rowconfigure(background, i, weight=1)
+        # Update window title with score
+        pygame.display.set_caption(f"2048 - Score: {self.state.score}")
 
-            row = []
-            for j in range(self.state.row_count):
-                cell = tk.Frame(background)
-                cell.grid(row=i, column=j, padx=_PADDING, pady=_PADDING, sticky=tk.NSEW)
-
-                label = tk.Label(cell, font=_FONT)
-                label.place(relwidth=1, relheight=1)
-                row.append(label)
-
-            self.labels.append(row)
-
-    def _update_cells(self):
+        # Draw cells
         for i in range(self.state.row_count):
             for j in range(self.state.row_count):
                 number = self.state.matrix[i][j]
-                self.labels[i][j].configure(text=str(number), bg=_BG_COLOR_DICT[number], fg=_FG_COLOR_DICT[number])
-                self.title(self.state.score)
+
+                # Calculate cell position
+                x = PADDING * (j + 1) + self.cell_size * j
+                y = PADDING * (i + 1) + self.cell_size * i
+
+                # Draw cell background
+                cell_rect = pygame.Rect(x, y, self.cell_size, self.cell_size)
+                pygame.draw.rect(
+                    self.window, hex_to_rgb(BG_COLOR_DICT[number]), cell_rect
+                )
+
+                # Draw number
+                if number != 0:
+                    text = self.font.render(
+                        str(number), True, hex_to_rgb(FG_COLOR_DICT[number])
+                    )
+                    text_rect = text.get_rect(
+                        center=(x + self.cell_size // 2, y + self.cell_size // 2)
+                    )
+                    self.window.blit(text, text_rect)
+
+        pygame.display.flip()
