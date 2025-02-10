@@ -2,6 +2,8 @@ from game import Game
 from stochastic import StochasticAgent
 from expectimax import ExpectimaxAgent
 from montecarlo import MonteCarloAgent
+from hybrid_agent import HybridAgent
+from smart_monte_carlo import SmartMonteCarloAgent
 import argparse
 import sys
 
@@ -21,6 +23,8 @@ def create_agent(agent_name: str, game: Game):
         "stochastic": StochasticAgent,
         "expectimax": ExpectimaxAgent,
         "montecarlo": MonteCarloAgent,
+        "hybrid": HybridAgent,
+        "smart_montecarlo": SmartMonteCarloAgent,
     }
 
     if agent_name not in agents:
@@ -44,6 +48,8 @@ def main():
             "stochastic",
             "expectimax",
             "montecarlo",
+            "hybrid",
+            "smart_montecarlo",
         ],
         default="expectimax",
         help="Agent to use for playing the game",
