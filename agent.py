@@ -22,8 +22,8 @@ class Agent:
         start = time.time()
         self.process()
         end = time.time()
-        print('Execution time: {} s'.format(end - start))
-        print('Final state:')
+        print("Execution time: {} s".format(end - start))
+        print("Final state:")
         print(np.array(self.state.matrix))
 
     def process(self):

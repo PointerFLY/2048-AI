@@ -1,8 +1,7 @@
 from game import Game
 from stochastic import StochasticAgent
 from expectimax import ExpectimaxAgent
-from monte_carlo import MonteCarloAgent
-from mcts import MonteCarloTreeSearchAgent
+from montecarlo import MonteCarloAgent
 import argparse
 import sys
 
@@ -21,8 +20,7 @@ def create_agent(agent_name: str, game: Game):
     agents = {
         "stochastic": StochasticAgent,
         "expectimax": ExpectimaxAgent,
-        "monte_carlo": MonteCarloAgent,
-        "mcts": MonteCarloTreeSearchAgent,
+        "montecarlo": MonteCarloAgent,
     }
 
     if agent_name not in agents:
@@ -42,7 +40,11 @@ def main():
     parser.add_argument(
         "--agent",
         "-a",
-        choices=["stochastic", "expectimax", "monte_carlo", "mcts"],
+        choices=[
+            "stochastic",
+            "expectimax",
+            "montecarlo",
+        ],
         default="expectimax",
         help="Agent to use for playing the game",
     )

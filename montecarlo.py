@@ -30,4 +30,3 @@ class MonteCarloAgent(Agent):
 
         score = total_score / _SAMPLE_PER_ACTION
         return score
-
