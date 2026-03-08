@@ -14,7 +14,7 @@ class Action(str):
 
 
 class State:
-    def __init__(self):
+    def __init__(self, generate_initial_tiles=True):
         self.row_count = _ROW_COUNT
         self.two_odds = _2_PROBABILITY
         self.matrix = [
@@ -23,8 +23,9 @@ class State:
         self.ui_dirty = True
         self.score = 0
         self._legal_actions_cache = None
-        for _ in range(_BEGIN_TILE_COUNT):
-            self.generate_next()
+        if generate_initial_tiles:
+            for _ in range(_BEGIN_TILE_COUNT):
+                self.generate_next()
 
     def get_successors(self, action: Action) -> [("State", int)]:
         direct_state = self.direct_successor(action)
@@ -114,12 +115,10 @@ class State:
         self.ui_dirty = True
 
     def copy(self):
-        state = State()
+        state = State(generate_initial_tiles=False)
         state.score = self.score
         state._legal_actions_cache = self._legal_actions_cache
-        for i in range(self.row_count):
-            for j in range(self.row_count):
-                state.matrix[i][j] = self.matrix[i][j]
+        state.matrix = [row[:] for row in self.matrix]
         return state
 
     def generate_next(self):
