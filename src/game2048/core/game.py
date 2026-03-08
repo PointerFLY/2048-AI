@@ -62,9 +62,11 @@ def hex_to_rgb(hex_color):
 
 
 class Game:
-    def __init__(self):
+    def __init__(self, agent_name: str = None):
         pygame.init()
-        pygame.display.set_caption("2048")
+        self.agent_name = agent_name
+        title = f"2048 - {self.agent_name}" if self.agent_name else "2048"
+        pygame.display.set_caption(title)
 
         self.state = State()
         self.window = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
@@ -97,8 +99,9 @@ class Game:
         # Fill background
         self.window.fill(hex_to_rgb(BG_COLOR))
 
-        # Update window title with score
-        pygame.display.set_caption(f"2048 - Score: {self.state.score}")
+        # Update window title with score and agent
+        title_prefix = f"2048 ({self.agent_name})" if self.agent_name else "2048"
+        pygame.display.set_caption(f"{title_prefix} - Score: {self.state.score}")
 
         # Draw cells
         for i in range(self.state.row_count):

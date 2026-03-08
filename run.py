@@ -66,7 +66,7 @@ def main(agent: str, api_key: str):
     sys.setrecursionlimit(10000)
 
     # Create game and agent
-    game = Game()
+    game = Game(agent_name=agent)
     agent_instance = create_agent(agent, game, api_key=api_key)
 
     # Start the game
