@@ -1,7 +1,8 @@
-from montecarlo import MonteCarloAgent
-from expectimax import ExpectimaxAgent
-from state import State
 from functools import lru_cache
+from random import randrange
+
+from game2048.agents.expectimax import ExpectimaxAgent
+from game2048.agents.montecarlo import MonteCarloAgent
 
 
 class SmartMonteCarloAgent(MonteCarloAgent):

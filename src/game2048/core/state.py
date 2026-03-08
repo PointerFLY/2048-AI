@@ -7,24 +7,26 @@ _BEGIN_TILE_COUNT = 2
 
 
 class Action(str):
-    LEFT = 'left'
-    RIGHT = 'right'
-    UP = 'up'
-    DOWN = 'down'
+    LEFT = "left"
+    RIGHT = "right"
+    UP = "up"
+    DOWN = "down"
 
 
 class State:
     def __init__(self):
         self.row_count = _ROW_COUNT
         self.two_odds = _2_PROBABILITY
-        self.matrix = [[0 for _ in range(self.row_count)] for _ in range(self.row_count)]
+        self.matrix = [
+            [0 for _ in range(self.row_count)] for _ in range(self.row_count)
+        ]
         self.ui_dirty = True
         self.score = 0
         self._legal_actions_cache = None
         for _ in range(_BEGIN_TILE_COUNT):
             self.generate_next()
 
-    def get_successors(self, action: Action) -> [('State', int)]:
+    def get_successors(self, action: Action) -> [("State", int)]:
         direct_state = self.direct_successor(action)
         if not direct_state:
             return []
@@ -41,7 +43,7 @@ class State:
 
         return successors
 
-    def direct_successor(self, action) -> Optional['State']:
+    def direct_successor(self, action) -> Optional["State"]:
         if action not in self.legal_actions():
             return None
 
@@ -170,7 +172,9 @@ class State:
                             actions.add(Action.LEFT)
 
                 if j < self.row_count - 1:
-                    if self._tile(i, j, transpose) != 0 and self._tile(i, j, transpose) == self._tile(i, j + 1, transpose):
+                    if self._tile(i, j, transpose) != 0 and self._tile(
+                        i, j, transpose
+                    ) == self._tile(i, j + 1, transpose):
                         if transpose:
                             actions.add(Action.UP)
                             actions.add(Action.DOWN)
@@ -195,7 +199,11 @@ class State:
                 if self._tile(i, j, transpose) == 0:
                     continue
 
-                if stack and not merged[-1] and stack[-1] == self._tile(i, j, transpose):
+                if (
+                    stack
+                    and not merged[-1]
+                    and stack[-1] == self._tile(i, j, transpose)
+                ):
                     v = 2 * stack.pop()
                     stack.append(v)
                     self.score += v

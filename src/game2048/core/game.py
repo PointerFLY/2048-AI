@@ -1,6 +1,8 @@
-import pygame
 import sys
-from state import State
+
+import pygame
+
+from game2048.core.state import State
 
 # Constants
 WINDOW_SIZE = 500

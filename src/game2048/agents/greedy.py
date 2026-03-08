@@ -1,4 +1,4 @@
-from agent import Agent
+from game2048.agents.agent import Agent
 
 
 class GreedyAgent(Agent):

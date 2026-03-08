@@ -1,5 +1,6 @@
-from agent import Agent
 from random import randrange
+
+from game2048.agents.agent import Agent
 
 
 class StochasticAgent(Agent):

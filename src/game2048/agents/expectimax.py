@@ -1,4 +1,4 @@
-from agent import Agent
+from game2048.agents.agent import Agent
 
 _DEPTH = 3
 
@@ -22,7 +22,11 @@ class ExpectimaxAgent(Agent):
                 if i % 2 == 0:
                     eval_ += state.matrix[i][j] * pow(r, state.row_count * i + j) * w
                 else:
-                    eval_ += state.matrix[i][j] * pow(r, state.row_count * i + (state.row_count - 1 - j)) * w
+                    eval_ += (
+                        state.matrix[i][j]
+                        * pow(r, state.row_count * i + (state.row_count - 1 - j))
+                        * w
+                    )
 
         return eval_
 

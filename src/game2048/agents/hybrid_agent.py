@@ -1,6 +1,6 @@
-from agent import Agent
-from montecarlo import MonteCarloAgent
-from expectimax import ExpectimaxAgent
+from game2048.agents.agent import Agent
+from game2048.agents.expectimax import ExpectimaxAgent
+from game2048.agents.montecarlo import MonteCarloAgent
 
 
 class HybridAgent(Agent):

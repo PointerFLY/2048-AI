@@ -1,7 +1,9 @@
-from game import Game
-from threading import Thread
 import time
+from threading import Thread
+
 import numpy as np
+
+from game2048.core.game import Game
 
 
 class Agent:

@@ -1,10 +1,11 @@
-from agent import Agent
-from state import State, Action
-from random import randrange
 import multiprocessing as mp
-from time import time
 from functools import lru_cache
+from random import randrange
+from time import time
+
 import numpy as np
+
+from game2048.agents.agent import Agent
 
 _TIME_LIMIT = 0.25  # seconds
 _CONFIDENCE_THRESHOLD = 0.95
