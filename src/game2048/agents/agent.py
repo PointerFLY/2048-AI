@@ -1,9 +1,12 @@
+import logging
 import time
 from threading import Thread
 
 import numpy as np
 
 from game2048.core.game import Game
+
+logger = logging.getLogger(__name__)
 
 
 class Agent:
@@ -24,9 +27,8 @@ class Agent:
         start = time.time()
         self.process()
         end = time.time()
-        print("Execution time: {} s".format(end - start))
-        print("Final state:")
-        print(np.array(self.state.matrix))
+        logger.info(f"Execution time: {end - start:.4f} s")
+        logger.info(f"Final state:\n{np.array(self.state.matrix)}")
 
     def process(self):
         action = self.next_action()

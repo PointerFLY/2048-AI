@@ -1,9 +1,12 @@
+import logging
 import random
 
 from google import genai
 from google.genai import types
 
 from game2048.agents.agent import Agent
+
+logger = logging.getLogger(__name__)
 
 
 class LLMAgent(Agent):
@@ -65,7 +68,7 @@ class LLMAgent(Agent):
                     return action
 
         except Exception as e:
-            print(f"LLM Agent encountered an error: {e}")
+            logger.error(f"LLM Agent encountered an error: {e}", exc_info=True)
 
         # Fallback to random legal action if LLM fails or outputs invalid action
         idx = random.randrange(len(legal_actions))

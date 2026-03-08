@@ -1,3 +1,4 @@
+import logging
 import sys
 
 import click
@@ -75,6 +76,11 @@ def main(agent: str, api_key: str):
 
 
 if __name__ == "__main__":
+    # Configure standard logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
     # Load environment variables from .env file before running the CLI
     load_dotenv()
     main()
