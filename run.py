@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 from game2048.agents.expectimax import ExpectimaxAgent
 from game2048.agents.llm import LLMAgent
+from game2048.agents.mcts import MCTSAgent
 from game2048.agents.montecarlo import (
     HybridAgent,
     MonteCarloAgent,
@@ -30,6 +31,7 @@ def create_agent(agent_name: str, game: Game, **kwargs):
         "montecarlo": MonteCarloAgent,
         "hybrid": HybridAgent,
         "smart_montecarlo": SmartMonteCarloAgent,
+        "mcts": MCTSAgent,
     }
 
     if agent_name not in agents:
@@ -48,7 +50,7 @@ def create_agent(agent_name: str, game: Game, **kwargs):
     "--agent",
     "-a",
     type=click.Choice(
-        ["llm", "expectimax", "montecarlo", "hybrid", "smart_montecarlo"],
+        ["llm", "expectimax", "montecarlo", "hybrid", "smart_montecarlo", "mcts"],
         case_sensitive=False,
     ),
     default="expectimax",
