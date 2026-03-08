@@ -2,10 +2,12 @@ import argparse
 import sys
 
 from game2048.agents.expectimax import ExpectimaxAgent
-from game2048.agents.hybrid_agent import HybridAgent
-from game2048.agents.montecarlo import MonteCarloAgent
-from game2048.agents.smart_monte_carlo import SmartMonteCarloAgent
-from game2048.agents.stochastic import StochasticAgent
+from game2048.agents.llm import LLMAgent
+from game2048.agents.montecarlo import (
+    HybridAgent,
+    MonteCarloAgent,
+    SmartMonteCarloAgent,
+)
 from game2048.core.game import Game
 
 
@@ -21,7 +23,7 @@ def create_agent(agent_name: str, game: Game):
         Agent instance
     """
     agents = {
-        "stochastic": StochasticAgent,
+        "llm": LLMAgent,
         "expectimax": ExpectimaxAgent,
         "montecarlo": MonteCarloAgent,
         "hybrid": HybridAgent,
@@ -46,7 +48,7 @@ def main():
         "--agent",
         "-a",
         choices=[
-            "stochastic",
+            "llm",
             "expectimax",
             "montecarlo",
             "hybrid",
