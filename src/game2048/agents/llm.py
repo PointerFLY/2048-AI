@@ -7,10 +7,11 @@ from game2048.agents.agent import Agent
 
 
 class LLMAgent(Agent):
-    def __init__(self, state):
-        super().__init__(state)
-        # Assumes GEMINI_API_KEY is set in the environment
-        self.client = genai.Client()
+    def __init__(self, game, api_key=None):
+        super().__init__(game)
+        # Initializes with explicit api_key if provided, otherwise looks for
+        # GEMINI_API_KEY in environment
+        self.client = genai.Client(api_key=api_key) if api_key else genai.Client()
         self.model = "gemini-2.5-flash"
 
     def next_action(self):
